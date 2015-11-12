@@ -5,7 +5,8 @@ using System.Collections.Generic;
 
 public class Settings : MonoBehaviour
 {
-    public Point CellSize;
+    public int CellWidth;
+    public int CellHeight;
     public float SegmentMinLength = 5f;
 
     void Start()
