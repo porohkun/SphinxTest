@@ -11,9 +11,7 @@ public class GameMap : MonoBehaviour
     public int Height = 100;
     public int Fill = 100;
 
-    public Text Text1;
-    public Text Text2;
-    public Text Text3;
+    public InputField Text1;
 
     private Camera _camera;
     private Transform _unitsContainer;
@@ -61,6 +59,12 @@ public class GameMap : MonoBehaviour
             }
     }
 
+    public void SetFill(string text)
+    {
+        if (!int.TryParse(text, out Fill))
+            Text1.text = Fill.ToString();
+    }
+
     public void FocusCamera()
     {
         float width = (Width + Height) * Global.CellWidth / 2f;
@@ -85,13 +89,13 @@ public class GameMap : MonoBehaviour
     Vector2 _lastPoint;
     void Update()
     {
-
+        for (int x = 0; x < Width; x++)
+            for (int y = 0; y < Height; y++)
+                _virtualUnits[x, y] = false;
+            
         Vector3 mousePos = Input.mousePosition;
         Vector2 worldPos = _camera.ScreenToWorldPoint(mousePos);
         Vector2 mapPos = WorldToMap(worldPos);
-        Text1.text = mousePos.ToString();
-        Text2.text = worldPos.ToString();
-        Text3.text = mapPos.ToString();
 
         if (Input.GetMouseButtonDown(0))
         {
@@ -109,9 +113,12 @@ public class GameMap : MonoBehaviour
             _path.Clear();
         bool started = _path.Count >= 1;
 
-        if (Input.GetMouseButtonUp(0) && _path.Count > 1)
+        if ((Input.GetMouseButton(0)||Input.GetMouseButtonUp(0)) && _path.Count > 2)
         {
+            _path.Add(mapPos);
             int points = 0;
+            int prevPoints = 0;
+            int tryes = 0;
             var path1 = _path;
             var path2 = _path;
             bool one = true;
@@ -120,28 +127,30 @@ public class GameMap : MonoBehaviour
                 points = FillLine(one ? path1 : path2, points);
                 one = !one;
                 if (one)
-                    path1 = path1.Offset(0.01f, true);
+                    path1 = path1.Offset(0.1f, true);
                 else
-                    path2 = path2.Offset(0.01f, false);
+                    path2 = path2.Offset(0.1f, false);
+                if (points == prevPoints) tryes++;
+                if (tryes > 100) break;
+                prevPoints = points;
             }
-            _path.Clear();
-            ShowUnits();
-        }
-        else if (started)
-        {
-            _path.Add(mapPos);
-            Vector2 p1 = _path[0];
-            for (int i = 1; i < _path.Count; i++)
+            if (Input.GetMouseButtonUp(0))
             {
-                Vector2 p2 = _path[i];
-
-                Debug.DrawLine(MapToWorld(p1), MapToWorld(p2), Color.white);
-
-                p1 = p2;
+                ShowUnits(true);
+                _path.Clear();
             }
-            _path.RemoveAt(_path.Count - 1);
+            else
+            {
+                ShowUnits(false);
+                _path.RemoveAt(_path.Count - 1);
+            }
         }
-
+        if (Input.GetMouseButtonUp(0) && _path.Count > 1)
+        {
+            ShowUnits(true);
+            _path.Clear();
+        }
+        
     }
 
     private int FillLine(List<Vector2> path, int points)
@@ -196,8 +205,8 @@ public class GameMap : MonoBehaviour
     bool DrawPoint(int x, int y)
     {
         if (!CorrectPosition(x, y)) return false;
-        bool oldValue = _units[x, y];
-        _units[x, y] = true;
+        bool oldValue = _units[x, y] || _virtualUnits[x, y];
+        _virtualUnits[x, y] = true;
         return !oldValue;
     }
 
@@ -208,11 +217,17 @@ public class GameMap : MonoBehaviour
         b = c;
     }
 
-    private void ShowUnits()
+    private void ShowUnits(bool real=false)
     {
         for (int x = 0; x < Width; x++)
             for (int y = 0; y < Height; y++)
-                _renderers[x, y].enabled = _units[x, y];
+            {
+                if (_virtualUnits[x, y] && real)
+                    _virtualUnits[x, y] = _virtualUnits[x, y];
+                if(real)
+                    _units[x, y] = _units[x, y] || _virtualUnits[x, y];
+                _renderers[x, y].enabled = real ? _units[x, y] : (_units[x, y] || _virtualUnits[x, y]);
+            }
     }
 
     private void SetBorders()
