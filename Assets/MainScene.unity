@@ -571,9 +571,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 03902f10ec79cc14a956683b12074d76, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  CellSize:
-    X: 132
-    Y: 86
+  CellWidth: 132
+  CellHeight: 86
   SegmentMinLength: 2
 --- !u!4 &1718625654
 Transform:

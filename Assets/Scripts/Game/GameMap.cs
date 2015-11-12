@@ -63,16 +63,16 @@ public class GameMap : MonoBehaviour
 
     public void FocusCamera()
     {
-        float width = (Width + Height) * Global.CellSize.X / 2f;
-        float height = (Width + Height) * Global.CellSize.Y / 2f;
+        float width = (Width + Height) * Global.CellWidth / 2f;
+        float height = (Width + Height) * Global.CellHeight / 2f;
         float sWidth = Screen.width;
         float sHeight = Screen.height;
 
         float mod = width/height;
         float sMod = sWidth/sHeight;
-        float size =( mod <= sMod ? height / 2f : width / sMod / 2f) + Global.CellSize.Y;
+        float size = (mod <= sMod ? height / 2f : width / sMod / 2f) + Global.CellHeight;
 
-        _camera.transform.position = new Vector3(width / 2 - Height * Global.CellSize.X / 2f, height / 2 , -10f);
+        _camera.transform.position = new Vector3(width / 2 - Height * Global.CellWidth / 2f, height / 2, -10f);
         _camera.orthographicSize = size;
     }
 
@@ -217,7 +217,7 @@ public class GameMap : MonoBehaviour
 
     private void SetBorders()
     {
-        var yOffset = new Vector2(0f, Global.CellSize.Y / 2f);
+        var yOffset = new Vector2(0f, Global.CellHeight / 2f);
         var border = (new GameObject("Border")).GetComponent<Transform>();
         border.SetParent(transform);
         var linePrefab = Resources.Load<LineRenderer>("Prefabs/line");
@@ -241,8 +241,8 @@ public class GameMap : MonoBehaviour
 
     public static Vector2 WorldToMap(Vector2 world)
     {
-        float xp = world.x / Global.CellSize.X;
-        float yp = world.y / Global.CellSize.Y;
+        float xp = world.x / Global.CellWidth;
+        float yp = world.y / Global.CellHeight;
 
         return new Vector2(xp + yp, yp - xp);
     }
@@ -250,8 +250,8 @@ public class GameMap : MonoBehaviour
     public static Vector2 MapToWorld(Vector2 map)
     {
         return new Vector2(
-            (map.x - map.y) * Global.CellSize.X / 2f,
-            (map.x + map.y) * Global.CellSize.Y / 2f
+            (map.x - map.y) * Global.CellWidth / 2f,
+            (map.x + map.y) * Global.CellHeight / 2f
             );
     }
 }

@@ -6,12 +6,14 @@ using UnityEngine;
 
 public static class Global
 {
-    public static Point CellSize { get; private set; }
+    public static int CellWidth { get; private set; }
+    public static int CellHeight { get; private set; }
     public static float SegmentMinLength { get; private set; }
 
     public static void LoadSettings(Settings settings)
     {
-        CellSize = settings.CellSize;
+        CellWidth = settings.CellWidth;
+        CellHeight = settings.CellHeight;
         SegmentMinLength = settings.SegmentMinLength;
     }
 }
