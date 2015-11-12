@@ -35,14 +35,23 @@ public static class Extensions
                 var b2 = path[i + 1];
                 var v2 = (b2 - b).normalized;
                 var angle = AngleBetween(v1, v2) / 2f;
-                Vector2 r1 = Quaternion.AngleAxis(angle, _zAxis) * v1;
-                Vector2 r2 = -r1;
+                if (Mathf.Abs(angle) >= 135 || Mathf.Abs(angle) <= 45)
+                {
+                    offset.Add(right ? new Vector2(-d.y, d.x).normalized * thick + b
+                        : new Vector2(d.y, -d.x).normalized * thick + b);
+                    first = true;
+                }
+                else
+                {
+                    Vector2 r1 = Quaternion.AngleAxis(angle, _zAxis) * v1;
+                    Vector2 r2 = -r1;
 
-                var aa = Mathf.Abs(angle - 90) * Mathf.Deg2Rad;
-                var bis = thick / Mathf.Cos(aa);
+                    var aa = Mathf.Abs(angle - 90) * Mathf.Deg2Rad;
+                    var bis = thick / Mathf.Cos(aa);
 
-                offset.Add(right ? r1.normalized * bis + b
-                    : r2.normalized * bis + b);
+                    offset.Add(right ? r1.normalized * bis + b
+                        : r2.normalized * bis + b);
+                }
             }
             a = b;
         }
